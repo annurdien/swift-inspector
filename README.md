@@ -1,7 +1,6 @@
-The SILInspector is a companion application to the
-"Swift 2 Under the Hood" presentation by Alex Blewitt.
+The Swift Inspector is inspired by [SILInspector](https://github.com/alblue/SILInspector) by Alex Blewitt
 
-## Web Edition
+## Swift Inspector Web
 
 This repository now contains a Dockerized web edition that mirrors the native macOS app. Paste Swift code into the browser, toggle compiler options, and inspect every stage the compiler produces: raw and canonical SIL, the AST, parser output, LLVM IR, and generated assembly.
 
