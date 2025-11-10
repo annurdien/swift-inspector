@@ -100,6 +100,7 @@ function App() {
   const hasBootstrapped = useRef(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const settingsRef = useRef<HTMLDivElement>(null)
+  const [helpOpen, setHelpOpen] = useState(false)
 
   const runDisabled = loading || source.trim().length === 0
 
@@ -238,6 +239,14 @@ function App() {
             <span className="indicator" />
             <span className="label-text">Auto</span>
           </label>
+          <button
+            className="icon-button"
+            type="button"
+            onClick={() => setHelpOpen(true)}
+            aria-label="Help"
+          >
+            <i className="fa-solid fa-circle-question"></i>
+          </button>
           <div className="settings-dropdown" ref={settingsRef}>
             <button
               className="icon-button"
@@ -308,6 +317,50 @@ function App() {
           </button>
         </div>
       </div>
+
+      {helpOpen && (
+        <div className="help-modal-overlay" onClick={() => setHelpOpen(false)}>
+          <div className="help-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-button" onClick={() => setHelpOpen(false)}>
+              &times;
+            </button>
+            <h2>About Swift Inspector</h2>
+            <p>
+              This tool allows you to inspect the various compilation stages of the Swift compiler,
+              providing insight into how your Swift code is transformed into machine-readable
+              instructions.
+            </p>
+            <h3>How to Use</h3>
+            <ul>
+              <li>
+                Write your Swift code in the <strong>Swift Source</strong> panel on the left.
+              </li>
+              <li>
+                The compiler will automatically run if <strong>Auto</strong> is enabled. You can
+                also trigger it manually with the Play button.
+              </li>
+              <li>
+                Select the different compiler outputs using the tabs at the top (e.g., AST, SIL
+                Raw, LLVM IR).
+              </li>
+              <li>
+                Use the <strong>Settings</strong> (gear icon) to toggle compiler flags like
+                optimizations (`-O`) and demangling.
+              </li>
+              <li>
+                Click <strong>Load Sample</strong> to reset the editor to the default example
+                code.
+              </li>
+            </ul>
+            <h3>What is SIL?</h3>
+            <p>
+              SIL (Swift Intermediate Language) is a high-level, Swift-specific intermediate
+              language that is used by the Swift compiler for flow-sensitive diagnostics, and for
+              performing high-level, language-specific optimizations.
+            </p>
+          </div>
+        </div>
+      )}
 
       {error && <div className="error-banner">{error}</div>}
 
