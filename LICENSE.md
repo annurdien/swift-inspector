@@ -1,4 +1,4 @@
-SILInspector is licensed under the MIT License
+SwiftInspector is licensed under the MIT License
 
 Copyright (c) 2015, Bandlem Limited
 

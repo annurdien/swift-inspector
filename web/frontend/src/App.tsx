@@ -210,7 +210,7 @@ function App() {
   return (
     <div className="app-shell">
       <div className="controls-bar">
-        <div className="app-title">SIL Inspector</div>
+        <div className="app-title">Swift Inspector</div>
         <div className="tabs">
           {VIEW_ORDER.map((view) => {
             const result = results?.[view]
@@ -362,6 +362,18 @@ function App() {
           </div>
         </section>
       </main>
+
+      <footer className="footer">
+        <p>
+          <a href="https://rasyid.codes" target="_blank" rel="noopener noreferrer">
+            Made with ♥ by Me
+          </a>{' '}
+          &bull;{' '}
+          <a href="https://github.com/annurdien/swift-inspector" target="_blank" rel="noopener noreferrer">
+            Source Code
+          </a>
+        </p>
+      </footer>
     </div>
   )
 }
