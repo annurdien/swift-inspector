@@ -1,0 +1,10 @@
+node_modules
+web/frontend/node_modules
+web/frontend/dist
+.git
+.gitignore
+SILInspector.xcodeproj
+SILInspector
+SILInspectorTests
+.vscode
+.DS_Store
