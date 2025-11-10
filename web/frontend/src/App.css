@@ -258,17 +258,22 @@ button.ghost:hover:enabled {
   min-height: 0;
 }
 
+.panel-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+}
+
 .panel {
   background: rgba(15, 23, 42, 0.75);
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: 20px;
-  padding: 1rem 1.25rem;
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
   backdrop-filter: blur(14px);
   min-height: 0;
   overflow: hidden;
+  flex: 1;
 }
 
 .panel-header {
@@ -276,6 +281,7 @@ button.ghost:hover:enabled {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+  padding: 0 0.5rem;
 }
 
 .panel-header h2 {
@@ -302,8 +308,7 @@ button.ghost:hover:enabled {
 
 .editor-panel,
 .output-panel {
-  display: flex;
-  flex-direction: column;
+  flex: 1;
   min-height: 0;
 }
 
@@ -311,8 +316,6 @@ button.ghost:hover:enabled {
   flex: 1;
   min-height: 0;
   display: flex;
-  border-radius: 14px;
-  border: 1px solid rgba(61, 81, 128, 0.5);
   overflow: hidden;
 }
 

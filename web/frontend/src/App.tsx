@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import Editor from '@monaco-editor/react'
+import Editor, { type Monaco } from '@monaco-editor/react'
 import './App.css'
 
 type ViewKey = 'silRaw' | 'silCanonical' | 'ast' | 'parse' | 'ir' | 'assembly'
@@ -101,6 +101,30 @@ function App() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const settingsRef = useRef<HTMLDivElement>(null)
   const [helpOpen, setHelpOpen] = useState(false)
+
+  const handleEditorWillMount = (monaco: Monaco) => {
+    monaco.editor.defineTheme('sil-inspector-theme', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        { token: 'keyword', foreground: '569cd6' },
+        { token: 'string', foreground: 'ce9178' },
+        { token: 'number', foreground: 'b5cea8' },
+        { token: 'comment', foreground: '6a9955' },
+        { token: 'type', foreground: '4ec9b0' },
+      ],
+      colors: {
+        'editor.background': '#0f172a',
+        'editor.foreground': '#e2e8f0',
+        'editor.lineHighlightBackground': '#1e293b',
+        'editorCursor.foreground': '#f8fafc',
+        'editorWhitespace.foreground': '#3b4a68',
+        'editorIndentGuide.background': '#3b4a68',
+        'editorIndentGuide.activeBackground': '#60a5fa',
+        'editorGutter.background': '#0f172a',
+      },
+    })
+  }
 
   const runDisabled = loading || source.trim().length === 0
 
@@ -365,30 +389,34 @@ function App() {
       {error && <div className="error-banner">{error}</div>}
 
       <main className="workspace">
-        <section className="panel editor-panel">
+        <div className="panel-column">
           <div className="panel-header">
             <div>
               <h2>Swift source</h2>
+              <p className="tab-description">The Swift code to be compiled</p>
             </div>
           </div>
-          <div className="editor-container">
-            <Editor
-              language="swift"
-              theme="vs-dark"
-              value={source}
-              onChange={(value) => setSource(value ?? '')}
-              options={{
-                minimap: { enabled: false },
-                fontSize: 14,
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                automaticLayout: true,
-              }}
-            />
-          </div>
-        </section>
+          <section className="panel editor-panel">
+            <div className="editor-container">
+              <Editor
+                language="swift"
+                theme="sil-inspector-theme"
+                value={source}
+                onChange={(value) => setSource(value ?? '')}
+                beforeMount={handleEditorWillMount}
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  lineNumbers: 'on',
+                  scrollBeyondLastLine: false,
+                  automaticLayout: true,
+                }}
+              />
+            </div>
+          </section>
+        </div>
 
-        <section className="panel output-panel">
+        <div className="panel-column">
           <div className="panel-header">
             <div>
               <h2>{VIEW_LABELS[activeView].title}</h2>
@@ -396,24 +424,26 @@ function App() {
             </div>
             <div className="status-chip">{formatCommandStatus(loading, activeResult)}</div>
           </div>
-
-          <div className="editor-container">
-            <Editor
-              language={getLanguageForView(activeView)}
-              theme="vs-dark"
-              value={activeResult?.output ?? 'Run the compiler to view output.'}
-              options={{
-                minimap: { enabled: false },
-                fontSize: 14,
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                automaticLayout: true,
-                readOnly: true,
-                wordWrap: 'off',
-              }}
-            />
-          </div>
-        </section>
+          <section className="panel output-panel">
+            <div className="editor-container">
+              <Editor
+                language={getLanguageForView(activeView)}
+                theme="sil-inspector-theme"
+                value={activeResult?.output ?? 'Run the compiler to view output.'}
+                beforeMount={handleEditorWillMount}
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  lineNumbers: 'on',
+                  scrollBeyondLastLine: false,
+                  automaticLayout: true,
+                  readOnly: true,
+                  wordWrap: 'off',
+                }}
+              />
+            </div>
+          </section>
+        </div>
       </main>
 
       <footer className="footer">
