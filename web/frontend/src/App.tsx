@@ -197,52 +197,54 @@ function App() {
         </div>
       </header>
 
-      <div className="toggle-row">
-        <label className="toggle">
-          <input
-            type="checkbox"
-            checked={autoRun}
-            onChange={(event) => setAutoRun(event.target.checked)}
-          />
-          <span className="indicator" />
-          <span className="label-text">Auto run on change</span>
-        </label>
-        <label className="toggle">
-          <input
-            type="checkbox"
-            checked={demangle}
-            onChange={(event) => setDemangle(event.target.checked)}
-          />
-          <span className="indicator" />
-          <span className="label-text">Demangle symbols</span>
-        </label>
-        <label className="toggle">
-          <input
-            type="checkbox"
-            checked={optimize}
-            onChange={(event) => setOptimize(event.target.checked)}
-          />
-          <span className="indicator" />
-          <span className="label-text">Enable -O</span>
-        </label>
-        <label className="toggle">
-          <input
-            type="checkbox"
-            checked={wholeModule}
-            onChange={(event) => setWholeModule(event.target.checked)}
-          />
-          <span className="indicator" />
-          <span className="label-text">Whole module optimization</span>
-        </label>
-        <label className="toggle">
-          <input
-            type="checkbox"
-            checked={parseAsLibrary}
-            onChange={(event) => setParseAsLibrary(event.target.checked)}
-          />
-          <span className="indicator" />
-          <span className="label-text">Parse as library</span>
-        </label>
+      <div className="controls-bar">
+        <div className="toggle-row">
+          <label className="toggle">
+            <input
+              type="checkbox"
+              checked={autoRun}
+              onChange={(event) => setAutoRun(event.target.checked)}
+            />
+            <span className="indicator" />
+            <span className="label-text">Auto run</span>
+          </label>
+          <label className="toggle">
+            <input
+              type="checkbox"
+              checked={demangle}
+              onChange={(event) => setDemangle(event.target.checked)}
+            />
+            <span className="indicator" />
+            <span className="label-text">Demangle</span>
+          </label>
+          <label className="toggle">
+            <input
+              type="checkbox"
+              checked={optimize}
+              onChange={(event) => setOptimize(event.target.checked)}
+            />
+            <span className="indicator" />
+            <span className="label-text">Optimize (-O)</span>
+          </label>
+          <label className="toggle">
+            <input
+              type="checkbox"
+              checked={wholeModule}
+              onChange={(event) => setWholeModule(event.target.checked)}
+            />
+            <span className="indicator" />
+            <span className="label-text">Whole module</span>
+          </label>
+          <label className="toggle">
+            <input
+              type="checkbox"
+              checked={parseAsLibrary}
+              onChange={(event) => setParseAsLibrary(event.target.checked)}
+            />
+            <span className="indicator" />
+            <span className="label-text">Parse as library</span>
+          </label>
+        </div>
       </div>
 
       {error && <div className="error-banner">{error}</div>}
@@ -252,7 +254,6 @@ function App() {
           <div className="panel-header">
             <div>
               <h2>Swift source</h2>
-              <p>Write Swift here. We stream it directly to swiftc on every run.</p>
             </div>
           </div>
           <div className="editor-container">
@@ -276,7 +277,6 @@ function App() {
           <div className="panel-header">
             <div>
               <h2>Compiler stages</h2>
-              <p>Select a stage to inspect its output and underlying command.</p>
             </div>
             <div className="status-chip">{formatCommandStatus(loading, activeResult)}</div>
           </div>
