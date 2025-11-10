@@ -22,33 +22,26 @@ body {
 
 .app-shell {
   display: grid;
-  grid-template-rows: auto auto auto 1fr;
-  gap: 1.25rem;
-  padding: 1.75rem 2.25rem 2.5rem;
+  grid-template-rows: auto 1fr;
+  gap: 1rem;
+  padding: 1rem 1.5rem 1.5rem;
   margin: 0 auto;
-  flex: 1;
+  width: 100%;
   max-width: 100%;
-  min-height: 0;
+  height: 100vh;
+  box-sizing: border-box;
 }
 
 .app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1.5rem;
+  display: none;
 }
 
-.app-header h1 {
-  margin: 0;
-  font-size: 1.75rem;
+.app-title {
+  font-size: 1.25rem;
+  font-weight: 600;
   letter-spacing: -0.02em;
-}
-
-.app-header p {
-  margin: 0.1rem 0 0;
-  color: #94a3b8;
-  max-width: 48ch;
-  font-size: 0.9rem;
+  color: #f8fafc;
+  margin-right: 1.5rem;
 }
 
 .header-actions {
@@ -101,6 +94,87 @@ button.ghost:hover:enabled {
   border-radius: 18px;
   backdrop-filter: blur(16px);
   padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 20;
+}
+
+.control-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #cbd5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.icon-button:hover:enabled {
+  background: rgba(148, 163, 184, 0.2);
+  border-color: rgba(148, 163, 184, 0.4);
+}
+
+.icon-button i {
+  font-size: 1.1rem;
+}
+
+.icon-button.primary {
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  color: #0b1220;
+  border: none;
+}
+
+.icon-button.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #0b1220;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.settings-dropdown {
+  position: relative;
+}
+
+.settings-panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 12px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  width: max-content;
 }
 
 .toggle-row {
@@ -182,7 +256,6 @@ button.ghost:hover:enabled {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.5rem;
-  flex: 1;
   min-height: 0;
 }
 
@@ -211,10 +284,11 @@ button.ghost:hover:enabled {
   font-size: 1.2rem;
 }
 
-.panel-header p {
+.panel-header p.tab-description {
   margin: 0;
   color: #94a3b8;
   font-size: 0.9rem;
+  padding: 0;
 }
 
 .status-chip {
@@ -253,9 +327,15 @@ button.ghost:hover:enabled {
 }
 
 .tabs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  display: flex;
   gap: 0.5rem;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tab {
@@ -263,13 +343,14 @@ button.ghost:hover:enabled {
   border: 1px solid rgba(148, 163, 184, 0.25);
   color: #cbd5f5;
   border-radius: 10px;
-  padding: 0.45rem 0.55rem;
+  padding: 0.45rem 0.75rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   transition: border-color 160ms ease, background 160ms ease, transform 120ms ease;
   cursor: pointer;
   font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .tab:hover {
@@ -294,6 +375,7 @@ button.ghost:hover:enabled {
   align-items: center;
   font-weight: 700;
   font-size: 0.7rem;
+  margin-left: 0.5rem;
 }
 
 .tab-description {
@@ -331,16 +413,13 @@ button.ghost:hover:enabled {
 
 .output-scroll {
   flex: 1;
+  overflow-y: auto;
   min-height: 0;
-  border-radius: 14px;
-  background: rgba(2, 6, 23, 0.82);
-  border: 1px solid rgba(15, 23, 42, 0.9);
-  overflow: auto;
-  padding: 0.8rem 1rem;
 }
 
 .output-scroll pre {
   margin: 0;
+  min-height: 100%;
   font-family: 'JetBrains Mono', 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
   font-size: 0.85rem;
   line-height: 1.55;
@@ -350,8 +429,10 @@ button.ghost:hover:enabled {
 
 @media (max-width: 1180px) {
   .app-shell {
-    padding: 1.5rem 1.5rem 2rem;
-    grid-template-rows: auto auto auto 1fr;
+    padding: 1rem;
+    grid-template-rows: auto 1fr;
+    height: auto;
+    min-height: 100vh;
   }
 
   .workspace {
@@ -361,22 +442,17 @@ button.ghost:hover:enabled {
 }
 
 @media (max-width: 720px) {
-  .app-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .header-actions {
-    align-self: stretch;
-    justify-content: flex-end;
-  }
-
   .controls-bar {
-    padding: 0.5rem;
+    flex-wrap: wrap;
   }
 
-  .toggle-row {
-    gap: 0.5rem;
+  .tabs {
+    order: 3;
+    width: 100%;
+  }
+
+  .control-actions {
+    margin-left: 0;
   }
 
   .command-bar {

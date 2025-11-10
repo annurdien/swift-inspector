@@ -16,10 +16,10 @@ type CompileResponse = {
 }
 
 const VIEW_ORDER: ViewKey[] = [
-  'silRaw',
-  'silCanonical',
   'ast',
   'parse',
+  'silRaw',
+  'silCanonical',
   'ir',
   'assembly',
 ]
@@ -42,7 +42,7 @@ const VIEW_LABELS: Record<ViewKey, { title: string; subtitle: string }> = {
     subtitle: 'Parser diagnostics and structure',
   },
   ir: {
-    title: 'IR',
+    title: 'LLVM IR',
     subtitle: 'LLVM intermediate representation',
   },
   assembly: {
@@ -72,6 +72,19 @@ const formatCommandStatus = (isLoading: boolean, result?: CompileResult) => {
   return result.exitCode === 0 ? 'Success' : `Exit code ${result.exitCode}`
 }
 
+const getLanguageForView = (view: ViewKey) => {
+  if (view === 'silRaw' || view === 'silCanonical') {
+    return 'swift'
+  }
+  if (view === 'ir') {
+    return 'text' // Using text for LLVM IR for now
+  }
+  if (view === 'assembly') {
+    return 'text' // Using text for assembly for now
+  }
+  return 'text'
+}
+
 function App() {
   const [source, setSource] = useState(DEFAULT_SOURCE)
   const [activeView, setActiveView] = useState<ViewKey>('silRaw')
@@ -85,6 +98,8 @@ function App() {
   const [error, setError] = useState<string | null>(null)
   const lastRunSignature = useRef<string | null>(null)
   const hasBootstrapped = useRef(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const settingsRef = useRef<HTMLDivElement>(null)
 
   const runDisabled = loading || source.trim().length === 0
 
@@ -176,29 +191,44 @@ function App() {
     runCompile({ skipCache: true })
   }, [runCompile])
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (settingsRef.current && !settingsRef.current.contains(event.target as Node)) {
+        setSettingsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
   const resetToSample = () => {
     setSource(DEFAULT_SOURCE)
   }
 
   return (
     <div className="app-shell">
-      <header className="app-header">
-        <div>
-          <h1>SIL Inspector Web</h1>
-          <p>Explore how the Swift compiler transforms your code across every stage.</p>
-        </div>
-        <div className="header-actions">
-          <button className="ghost" type="button" onClick={resetToSample} disabled={loading}>
-            Load sample
-          </button>
-          <button className="primary" type="button" onClick={() => runCompile({ skipCache: true })} disabled={runDisabled}>
-            {loading ? 'Running...' : 'Run compiler'}
-          </button>
-        </div>
-      </header>
-
       <div className="controls-bar">
-        <div className="toggle-row">
+        <div className="app-title">SIL Inspector</div>
+        <div className="tabs">
+          {VIEW_ORDER.map((view) => {
+            const result = results?.[view]
+            const isActive = view === activeView
+            return (
+              <button
+                key={view}
+                type="button"
+                className={`tab ${isActive ? 'active' : ''}`}
+                onClick={() => setActiveView(view)}
+              >
+                <span>{VIEW_LABELS[view].title}</span>
+                {result && result.exitCode !== 0 && <span className="tab-alert">!</span>}
+              </button>
+            )
+          })}
+        </div>
+        <div className="control-actions">
           <label className="toggle">
             <input
               type="checkbox"
@@ -206,44 +236,76 @@ function App() {
               onChange={(event) => setAutoRun(event.target.checked)}
             />
             <span className="indicator" />
-            <span className="label-text">Auto run</span>
+            <span className="label-text">Auto</span>
           </label>
-          <label className="toggle">
-            <input
-              type="checkbox"
-              checked={demangle}
-              onChange={(event) => setDemangle(event.target.checked)}
-            />
-            <span className="indicator" />
-            <span className="label-text">Demangle</span>
-          </label>
-          <label className="toggle">
-            <input
-              type="checkbox"
-              checked={optimize}
-              onChange={(event) => setOptimize(event.target.checked)}
-            />
-            <span className="indicator" />
-            <span className="label-text">Optimize (-O)</span>
-          </label>
-          <label className="toggle">
-            <input
-              type="checkbox"
-              checked={wholeModule}
-              onChange={(event) => setWholeModule(event.target.checked)}
-            />
-            <span className="indicator" />
-            <span className="label-text">Whole module</span>
-          </label>
-          <label className="toggle">
-            <input
-              type="checkbox"
-              checked={parseAsLibrary}
-              onChange={(event) => setParseAsLibrary(event.target.checked)}
-            />
-            <span className="indicator" />
-            <span className="label-text">Parse as library</span>
-          </label>
+          <div className="settings-dropdown" ref={settingsRef}>
+            <button
+              className="icon-button"
+              type="button"
+              onClick={() => setSettingsOpen(!settingsOpen)}
+              aria-label="Settings"
+            >
+              <i className="fa-solid fa-gear"></i>
+            </button>
+            {settingsOpen && (
+              <div className="settings-panel">
+                <label className="toggle">
+                  <input
+                    type="checkbox"
+                    checked={demangle}
+                    onChange={(event) => setDemangle(event.target.checked)}
+                  />
+                  <span className="indicator" />
+                  <span className="label-text">Demangle</span>
+                </label>
+                <label className="toggle">
+                  <input
+                    type="checkbox"
+                    checked={optimize}
+                    onChange={(event) => setOptimize(event.target.checked)}
+                  />
+                  <span className="indicator" />
+                  <span className="label-text">Optimize (-O)</span>
+                </label>
+                <label className="toggle">
+                  <input
+                    type="checkbox"
+                    checked={wholeModule}
+                    onChange={(event) => setWholeModule(event.target.checked)}
+                  />
+                  <span className="indicator" />
+                  <span className="label-text">Whole module</span>
+                </label>
+                <label className="toggle">
+                  <input
+                    type="checkbox"
+                    checked={parseAsLibrary}
+                    onChange={(event) => setParseAsLibrary(event.target.checked)}
+                  />
+                  <span className="indicator" />
+                  <span className="label-text">Parse as library</span>
+                </label>
+              </div>
+            )}
+          </div>
+          <button
+            className="icon-button"
+            type="button"
+            onClick={resetToSample}
+            disabled={loading}
+            aria-label="Load sample"
+          >
+            <i className="fa-solid fa-file-code"></i>
+          </button>
+          <button
+            className="icon-button primary"
+            type="button"
+            onClick={() => runCompile({ skipCache: true })}
+            disabled={runDisabled}
+            aria-label="Run compiler"
+          >
+            {loading ? <div className="spinner" /> : <i className="fa-solid fa-play"></i>}
+          </button>
         </div>
       </div>
 
@@ -276,38 +338,27 @@ function App() {
         <section className="panel output-panel">
           <div className="panel-header">
             <div>
-              <h2>Compiler stages</h2>
+              <h2>{VIEW_LABELS[activeView].title}</h2>
+              <p className="tab-description">{VIEW_LABELS[activeView].subtitle}</p>
             </div>
             <div className="status-chip">{formatCommandStatus(loading, activeResult)}</div>
           </div>
 
-          <div className="tabs">
-            {VIEW_ORDER.map((view) => {
-              const result = results?.[view]
-              const isActive = view === activeView
-              return (
-                <button
-                  key={view}
-                  type="button"
-                  className={`tab ${isActive ? 'active' : ''}`}
-                  onClick={() => setActiveView(view)}
-                >
-                  <span>{VIEW_LABELS[view].title}</span>
-                  {result && result.exitCode !== 0 && <span className="tab-alert">!</span>}
-                </button>
-              )
-            })}
-          </div>
-
-          <div className="tab-description">{VIEW_LABELS[activeView].subtitle}</div>
-
-          <div className="command-bar">
-            <span className="command-label">Command</span>
-            <code className="command-text">{activeResult?.command ?? 'swiftc - …'}</code>
-          </div>
-
-          <div className="output-scroll">
-            <pre>{activeResult?.output ?? 'Run the compiler to view output.'}</pre>
+          <div className="editor-container">
+            <Editor
+              language={getLanguageForView(activeView)}
+              theme="vs-dark"
+              value={activeResult?.output ?? 'Run the compiler to view output.'}
+              options={{
+                minimap: { enabled: false },
+                fontSize: 14,
+                lineNumbers: 'on',
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                readOnly: true,
+                wordWrap: 'off',
+              }}
+            />
           </div>
         </section>
       </main>
