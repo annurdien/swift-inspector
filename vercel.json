@@ -1,0 +1,29 @@
+{
+  "$schema": "https://openapi.vercel.com/vercel.schema.json",
+  "builds": [
+    {
+      "src": "web/backend/app/main.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "web/frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "workdir": "web/frontend"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "web/backend/app/main.py"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/web/frontend/index.html"
+    }
+  ]
+}
